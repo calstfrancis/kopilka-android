@@ -18,7 +18,9 @@ jobs:
           cache: gradle
 
       - name: Decode keystore
-        run: echo "${{ secrets.SIGNING_KEYSTORE }}" | base64 -d > $RUNNER_TEMP/kopilka.jks
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SIGNING_KEYSTORE }}
+        run: echo "$KEYSTORE_BASE64" | base64 -d > $RUNNER_TEMP/kopilka.jks
 
       - name: Build release APK
         env:
