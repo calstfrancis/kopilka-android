@@ -3,7 +3,6 @@ package com.kopilka.android.ui.spending_log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -12,6 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -75,11 +77,8 @@ fun SpendingLogScreen(
                     }
                 }
                 else -> {
-                    // Group entries by date
                     val grouped = state.entries.groupBy { it.date }
-                    LazyColumn(
-                        contentPadding = PaddingValues(bottom = 80.dp),
-                    ) {
+                    LazyColumn(contentPadding = PaddingValues(bottom = 80.dp)) {
                         grouped.forEach { (date, dayEntries) ->
                             item(key = "header_$date") {
                                 Text(
@@ -105,7 +104,7 @@ fun SpendingLogScreen(
                                             )
                                             if (i < dayEntries.lastIndex) {
                                                 HorizontalDivider(
-                                                    modifier = Modifier.padding(horizontal = 16.dp),
+                                                    modifier = Modifier.padding(start = 19.dp, end = 16.dp),
                                                     color = MaterialTheme.colorScheme.outlineVariant,
                                                 )
                                             }
@@ -128,72 +127,83 @@ private fun LogEntryRow(
     onEdit: () -> Unit,
     onDelete: () -> Unit,
 ) {
+    val haptic = LocalHapticFeedback.current
     var showMenu by remember { mutableStateOf(false) }
 
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(start = 16.dp, end = 4.dp, top = 10.dp, bottom = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-    ) {
-        entry.categoryColor?.let { c ->
-            Box(Modifier.size(8.dp).background(c, MaterialTheme.shapes.small))
-        }
-
-        Column(Modifier.weight(1f)) {
-            Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    entry.categoryName,
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                )
-                if (entry.description.isNotBlank()) {
-                    Text("·", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    Text(
-                        entry.description,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                    )
-                }
-            }
-            Text(
-                entry.user,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.outlineVariant,
-            )
-        }
-
-        Text(
-            "$${String.format("%.2f", entry.amount)}",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
+    Row(Modifier.height(IntrinsicSize.Min)) {
+        // Category color left strip
+        Box(
+            Modifier
+                .width(3.dp)
+                .fillMaxHeight()
+                .background(entry.categoryColor ?: Color.Transparent)
         )
 
-        Box {
-            IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
-                Icon(
-                    Icons.Default.Edit,
-                    contentDescription = "Options",
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 13.dp, end = 4.dp, top = 10.dp, bottom = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Column(Modifier.weight(1f)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        entry.categoryName,
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    if (entry.description.isNotBlank()) {
+                        Text("·", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(
+                            entry.description,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+                Text(
+                    entry.user,
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.outlineVariant,
                 )
             }
-            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
-                DropdownMenuItem(
-                    text = { Text("Edit") },
-                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
-                    onClick = { showMenu = false; onEdit() },
-                )
-                DropdownMenuItem(
-                    text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
-                    leadingIcon = {
-                        Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                    },
-                    onClick = { showMenu = false; onDelete() },
-                )
+
+            Text(
+                "$${String.format("%.2f", entry.amount)}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+            )
+
+            Box {
+                IconButton(onClick = { showMenu = true }, modifier = Modifier.size(32.dp)) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Options",
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                    DropdownMenuItem(
+                        text = { Text("Edit") },
+                        leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
+                        onClick = { showMenu = false; onEdit() },
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                        leadingIcon = {
+                            Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                        },
+                        onClick = {
+                            showMenu = false
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onDelete()
+                        },
+                    )
+                }
             }
         }
     }
