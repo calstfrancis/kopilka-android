@@ -1,5 +1,6 @@
 package com.kopilka.android.ui.spending_log
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,6 +12,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -46,6 +50,28 @@ fun SpendingLogScreen(
         },
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
+            // 6-month bar chart
+            if (state.monthlyTotals.isNotEmpty()) {
+                MonthlyBarChart(
+                    monthlyTotals = state.monthlyTotals,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                )
+            }
+
+            // Search field
+            OutlinedTextField(
+                value = state.searchQuery,
+                onValueChange = { vm.setSearch(it) },
+                label = { Text("Search") },
+                placeholder = { Text("Description or category") },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+            )
+
             // Period filter chips
             Row(
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
@@ -204,6 +230,65 @@ private fun LogEntryRow(
                         },
                     )
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun MonthlyBarChart(
+    monthlyTotals: List<Pair<String, Float>>,
+    modifier: Modifier = Modifier,
+) {
+    if (monthlyTotals.isEmpty() || monthlyTotals.all { it.second == 0f }) return
+    val maxVal = monthlyTotals.maxOf { it.second }.coerceAtLeast(1f)
+    val barColor = MaterialTheme.colorScheme.primary
+    val trackColor = MaterialTheme.colorScheme.surfaceVariant
+    val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val labelStyle = MaterialTheme.typography.labelSmall
+
+    Column(modifier = modifier) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(72.dp),
+        ) {
+            val count = monthlyTotals.size
+            val gap = 6.dp.toPx()
+            val totalGap = gap * (count - 1)
+            val barWidth = (size.width - totalGap) / count
+            val maxBarHeight = size.height
+
+            monthlyTotals.forEachIndexed { i, (_, value) ->
+                val x = i * (barWidth + gap)
+                drawRoundRect(
+                    color = trackColor,
+                    topLeft = Offset(x, 0f),
+                    size = Size(barWidth, maxBarHeight),
+                    cornerRadius = CornerRadius(4.dp.toPx()),
+                )
+                if (value > 0f) {
+                    val filledHeight = (value / maxVal) * maxBarHeight
+                    drawRoundRect(
+                        color = barColor,
+                        topLeft = Offset(x, maxBarHeight - filledHeight),
+                        size = Size(barWidth, filledHeight),
+                        cornerRadius = CornerRadius(4.dp.toPx()),
+                    )
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            monthlyTotals.forEach { (label, _) ->
+                Text(
+                    label,
+                    style = labelStyle,
+                    color = labelColor,
+                )
             }
         }
     }

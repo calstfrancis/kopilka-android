@@ -5,8 +5,10 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -40,6 +42,8 @@ import com.kopilka.android.domain.RecentEntryUiState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+// BillUiState defined in BillUiState.kt in same package
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CategoriesScreen(
@@ -47,6 +51,9 @@ fun CategoriesScreen(
     onAddSpending: () -> Unit,
     onEditEntry: (String) -> Unit,
     onViewAll: () -> Unit,
+    onCategoryClick: (String) -> Unit = {},
+    onSavingsClick: () -> Unit = {},
+    onDebtClick: () -> Unit = {},
     vm: CategoriesViewModel = viewModel(),
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
@@ -144,14 +151,43 @@ fun CategoriesScreen(
                         // Hero totals card
                         if (state.categories.isNotEmpty()) {
                             item {
-                                HeroTotalsCard(state.categories, state.budget)
+                                HeroTotalsCard(
+                                    categories = state.categories,
+                                    budget = state.budget,
+                                    onSavingsClick = onSavingsClick,
+                                    onDebtClick = onDebtClick,
+                                )
+                            }
+                        }
+
+                        // Upcoming bills strip
+                        if (state.upcomingBills.isNotEmpty()) {
+                            item {
+                                Text(
+                                    "Upcoming",
+                                    style = MaterialTheme.typography.titleSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.padding(horizontal = 4.dp),
+                                )
+                            }
+                            item {
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                    contentPadding = PaddingValues(horizontal = 4.dp),
+                                ) {
+                                    state.upcomingBills.forEach { bill ->
+                                        item(key = bill.id) {
+                                            BillCard(bill)
+                                        }
+                                    }
+                                }
                             }
                         }
 
                         // Category cards
                         state.categories.forEach { cat ->
                             item(key = cat.id) {
-                                CategoryCard(cat)
+                                CategoryCard(cat, onClick = { onCategoryClick(cat.id) })
                             }
                         }
 
@@ -236,7 +272,12 @@ fun CategoriesScreen(
 }
 
 @Composable
-private fun HeroTotalsCard(categories: List<CategoryUiState>, budget: BudgetJson?) {
+private fun HeroTotalsCard(
+    categories: List<CategoryUiState>,
+    budget: BudgetJson?,
+    onSavingsClick: () -> Unit = {},
+    onDebtClick: () -> Unit = {},
+) {
     val today = LocalDate.now()
     val monthlySpent = budget?.spending?.mapNotNull { entry ->
         try {
@@ -323,13 +364,24 @@ private fun HeroTotalsCard(categories: List<CategoryUiState>, budget: BudgetJson
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
                     )
                 }
+                Spacer(Modifier.height(4.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    AssistChip(
+                        onClick = onSavingsClick,
+                        label = { Text("Goals", style = MaterialTheme.typography.labelSmall) },
+                    )
+                    AssistChip(
+                        onClick = onDebtClick,
+                        label = { Text("Debt", style = MaterialTheme.typography.labelSmall) },
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-private fun CategoryCard(cat: CategoryUiState) {
+private fun CategoryCard(cat: CategoryUiState, onClick: () -> Unit = {}) {
     val animatedProgress by animateFloatAsState(
         targetValue = cat.progress,
         animationSpec = tween(durationMillis = 700, easing = FastOutSlowInEasing),
@@ -345,6 +397,7 @@ private fun CategoryCard(cat: CategoryUiState) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
+        onClick = onClick,
     ) {
         Row(Modifier.height(IntrinsicSize.Min)) {
             // Gradient left edge strip
@@ -539,6 +592,39 @@ private fun RecentEntryRow(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun BillCard(bill: BillUiState) {
+    Card(
+        modifier = Modifier.width(140.dp),
+        shape = MaterialTheme.shapes.medium,
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                bill.name,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+            Text(
+                "$${String.format("%.2f", bill.amount)}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Text(
+                bill.dueDateLabel,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }

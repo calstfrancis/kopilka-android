@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 enum class LogPeriod(val label: String) {
     WEEK("This week"),
@@ -26,6 +27,9 @@ data class SpendingLogUiState(
     val isLoading: Boolean = true,
     val error: String? = null,
     val period: LogPeriod = LogPeriod.MONTH,
+    val searchQuery: String = "",
+    /** Monthly totals for last 6 months, index 0 = oldest. */
+    val monthlyTotals: List<Pair<String, Float>> = emptyList(),
 )
 
 class SpendingLogViewModel(app: Application) : AndroidViewModel(app) {
@@ -68,6 +72,11 @@ class SpendingLogViewModel(app: Application) : AndroidViewModel(app) {
         applyFilter()
     }
 
+    fun setSearch(q: String) {
+        _state.value = _state.value.copy(searchQuery = q)
+        applyFilter()
+    }
+
     fun deleteEntry(entryId: String, myName: String) {
         viewModelScope.launch {
             val b = budget ?: return@launch
@@ -82,10 +91,11 @@ class SpendingLogViewModel(app: Application) : AndroidViewModel(app) {
         val b = budget ?: return
         val today = LocalDate.now()
         val catById = b.categories.associateBy { it.id }
+        val query = _state.value.searchQuery.trim().lowercase()
 
         val filtered = b.spending
             .filter { entry ->
-                when (_state.value.period) {
+                val inPeriod = when (_state.value.period) {
                     LogPeriod.WEEK -> {
                         val d = LocalDate.parse(entry.date)
                         d >= today.minusDays(6)
@@ -96,6 +106,10 @@ class SpendingLogViewModel(app: Application) : AndroidViewModel(app) {
                     }
                     LogPeriod.ALL -> true
                 }
+                if (!inPeriod) return@filter false
+                if (query.isEmpty()) return@filter true
+                val catName = catById[entry.categoryId]?.name ?: ""
+                entry.description.lowercase().contains(query) || catName.lowercase().contains(query)
             }
             .sortedByDescending { it.date }
             .map { entry ->
@@ -111,6 +125,28 @@ class SpendingLogViewModel(app: Application) : AndroidViewModel(app) {
                 )
             }
 
-        _state.value = _state.value.copy(isLoading = false, entries = filtered, error = null)
+        // Build 6-month bar chart data
+        val monthFmt = DateTimeFormatter.ofPattern("MMM")
+        val monthlyTotals = (5 downTo 0).map { monthsAgo ->
+            val month = today.minusMonths(monthsAgo.toLong())
+            val label = month.format(monthFmt)
+            val total = b.spending
+                .filter { entry ->
+                    try {
+                        val d = LocalDate.parse(entry.date)
+                        d.year == month.year && d.monthValue == month.monthValue
+                    } catch (_: Exception) { false }
+                }
+                .sumOf { it.amount }
+                .toFloat()
+            label to total
+        }
+
+        _state.value = _state.value.copy(
+            isLoading = false,
+            entries = filtered,
+            error = null,
+            monthlyTotals = monthlyTotals,
+        )
     }
 }

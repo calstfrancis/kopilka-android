@@ -15,6 +15,7 @@ import com.kopilka.android.domain.RecentEntryUiState
 import com.kopilka.android.domain.buildCategoryStates
 import com.kopilka.android.domain.buildRecentEntries
 import com.kopilka.android.domain.buildRecurringEntries
+import com.kopilka.android.ui.categories.buildUpcomingBills
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -28,6 +29,7 @@ data class CategoriesScreenState(
     val categories: List<CategoryUiState> = emptyList(),
     val recentEntries: List<RecentEntryUiState> = emptyList(),
     val recurringEntries: List<RecurringUiState> = emptyList(),
+    val upcomingBills: List<BillUiState> = emptyList(),
     val isLoading: Boolean = false,
     val syncError: String? = null,
     val lastSynced: String? = null,
@@ -89,6 +91,7 @@ class CategoriesViewModel(app: Application) : AndroidViewModel(app) {
             categories = buildCategoryStates(budget),
             recentEntries = buildRecentEntries(budget),
             recurringEntries = buildRecurringEntries(budget),
+            upcomingBills = buildUpcomingBills(budget),
             coupleNames = budget.metadata.couple,
             lastSynced = "synced ${fmt.format(Date(syncedAt))}",
             conflict = null,

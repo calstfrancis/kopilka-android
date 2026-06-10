@@ -11,6 +11,7 @@ import com.kopilka.android.data.model.BudgetJson
 import com.kopilka.android.data.model.SpendingEntryJson
 import com.kopilka.android.data.storage.BudgetCache
 import com.kopilka.android.data.storage.CredentialStore
+import com.kopilka.android.domain.buildCategoryStates
 import com.kopilka.android.util.NotificationHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -106,6 +107,18 @@ class SyncManager(private val context: Context) {
                         val desc = if (newPartnerEntries.size == 1) newPartnerEntries.first().description
                                    else "${newPartnerEntries.size} new entries"
                         notif.showPartnerSpent(partnerName, newPartnerEntries.size, total, desc)
+                    }
+                }
+                // Fire budget alerts for categories that newly crossed 80%
+                if (cached != null) {
+                    val prevStates = buildCategoryStates(cached).associateBy { it.id }
+                    val newStates = buildCategoryStates(budget)
+                    newStates.forEach { newCat ->
+                        val prevProgress = prevStates[newCat.id]?.progress ?: 0f
+                        val newPct = (newCat.progress * 100).toInt()
+                        if (prevProgress < 0.80f && newCat.progress >= 0.80f) {
+                            notif.showBudgetAlert(newCat.name, newPct)
+                        }
                     }
                 }
                 cache.save(budget, etag)

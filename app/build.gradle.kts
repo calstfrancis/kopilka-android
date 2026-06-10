@@ -22,8 +22,8 @@ android {
         applicationId = "com.kopilka.android"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
-        versionName = "1.0.0-beta1"
+        versionCode = 4
+        versionName = "1.0.0"
     }
 
     buildTypes {

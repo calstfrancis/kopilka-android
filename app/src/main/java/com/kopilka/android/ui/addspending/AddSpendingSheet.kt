@@ -2,7 +2,6 @@ package com.kopilka.android.ui.addspending
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -10,7 +9,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -115,15 +115,22 @@ fun AddSpendingScreen(
                         }
                     }
 
-                    // Amount
+                    // Amount display (read-only) + calculator pad
                     OutlinedTextField(
-                        value = state.amount,
-                        onValueChange = vm::onAmount,
+                        value = if (state.amount.isEmpty()) "0" else state.amount,
+                        onValueChange = {},
+                        readOnly = true,
                         label = { Text("Amount (${budget.config.currency})") },
-                        placeholder = { Text("0.00") },
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                         prefix = { Text("$") },
+                        textStyle = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.End,
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    AmountPad(
+                        value = state.amount,
+                        onValue = vm::onAmount,
                         modifier = Modifier.fillMaxWidth(),
                     )
 

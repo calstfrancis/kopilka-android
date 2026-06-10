@@ -10,11 +10,11 @@ data class BudgetJson(
     val metadata: MetadataJson = MetadataJson(),
     val config: ConfigJson = ConfigJson(),
     val income: List<JsonObject> = emptyList(),
-    @SerialName("expenses_fixed") val expensesFixed: List<JsonObject> = emptyList(),
-    val debt: List<JsonObject> = emptyList(),
+    @SerialName("expenses_fixed") val expensesFixed: List<FixedExpenseJson> = emptyList(),
+    val debt: List<DebtJson> = emptyList(),
     val categories: List<CategoryJson> = emptyList(),
     val spending: List<SpendingEntryJson> = emptyList(),
-    @SerialName("savings_goals") val savingsGoals: List<JsonObject> = emptyList(),
+    @SerialName("savings_goals") val savingsGoals: List<SavingsGoalJson> = emptyList(),
     val assets: List<JsonObject> = emptyList(),
     val recurring: List<RecurringEntryJson> = emptyList(),
 )
@@ -71,6 +71,42 @@ data class RecurringEntryJson(
     val frequency: String,
     @SerialName("next_date") val nextDate: String,
     val active: Boolean = true,
+)
+
+@Serializable
+data class FixedExpenseJson(
+    val id: String,
+    val name: String,
+    val amount: Double,
+    val frequency: String,
+    val notes: String = "",
+    val active: Boolean = true,
+    val date: String = "",
+    @SerialName("due_day") val dueDay: Int = 0,
+    @SerialName("due_weekday") val dueWeekday: Int = -1,
+    @SerialName("due_doy") val dueDoy: Int = 0,
+)
+
+@Serializable
+data class DebtJson(
+    val id: String,
+    val name: String,
+    val balance: Double,
+    val rate: Double,
+    val payment: Double,
+    val frequency: String,
+    val notes: String = "",
+    @SerialName("balance_history") val balanceHistory: List<JsonObject> = emptyList(),
+)
+
+@Serializable
+data class SavingsGoalJson(
+    val id: String,
+    val name: String,
+    val target: Double,
+    val current: Double = 0.0,
+    @SerialName("target_date") val targetDate: String = "",
+    val notes: String = "",
 )
 
 // Sentinel category_id for one-time / irregular purchases — matches the desktop app

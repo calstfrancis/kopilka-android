@@ -8,8 +8,10 @@ import androidx.core.app.NotificationManagerCompat
 
 private const val CHANNEL_SYNC = "kopilka_sync"
 private const val CHANNEL_PARTNER = "kopilka_partner"
+private const val CHANNEL_BUDGET = "kopilka_budget"
 private const val NOTIF_SYNC_ID = 1
 private const val NOTIF_PARTNER_ID = 2
+private const val NOTIF_BUDGET_ID = 3
 
 class NotificationHelper(private val context: Context) {
 
@@ -24,6 +26,11 @@ class NotificationHelper(private val context: Context) {
         mgr.createNotificationChannel(
             NotificationChannel(CHANNEL_PARTNER, "Partner Activity", NotificationManager.IMPORTANCE_DEFAULT).apply {
                 description = "Notifies when your partner logs a purchase"
+            }
+        )
+        mgr.createNotificationChannel(
+            NotificationChannel(CHANNEL_BUDGET, "Budget Alerts", NotificationManager.IMPORTANCE_DEFAULT).apply {
+                description = "Alerts when a category reaches 80% of its budget"
             }
         )
     }
@@ -44,6 +51,18 @@ class NotificationHelper(private val context: Context) {
 
     fun hideSyncing() {
         NotificationManagerCompat.from(context).cancel(NOTIF_SYNC_ID)
+    }
+
+    fun showBudgetAlert(categoryName: String, pct: Int) {
+        val notif = NotificationCompat.Builder(context, CHANNEL_BUDGET)
+            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setContentTitle("Budget alert: $categoryName")
+            .setContentText("You've used $pct% of your $categoryName budget")
+            .setAutoCancel(true)
+            .build()
+        try {
+            NotificationManagerCompat.from(context).notify(NOTIF_BUDGET_ID, notif)
+        } catch (_: SecurityException) {}
     }
 
     fun showPartnerSpent(partnerName: String, count: Int, total: Double, description: String) {

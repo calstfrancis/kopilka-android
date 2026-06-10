@@ -27,6 +27,9 @@ import com.kopilka.android.ui.addspending.AddSpendingScreen
 import com.kopilka.android.ui.auth.authenticate
 import com.kopilka.android.ui.categories.CategoriesScreen
 import com.kopilka.android.ui.categories.CategoriesViewModel
+import com.kopilka.android.ui.category_detail.CategoryDetailScreen
+import com.kopilka.android.ui.debt.DebtScreen
+import com.kopilka.android.ui.savings.SavingsScreen
 import com.kopilka.android.ui.setup.SetupScreen
 import com.kopilka.android.ui.spending_log.SpendingLogScreen
 import com.kopilka.android.ui.theme.KopilkaTheme
@@ -40,6 +43,9 @@ private const val ROUTE_CATEGORIES = "categories"
 private const val ROUTE_ADD = "add?entryId={entryId}"
 private const val ROUTE_ADD_BASE = "add"
 private const val ROUTE_LOG = "log"
+private const val ROUTE_CATEGORY_DETAIL = "category/{categoryId}"
+private const val ROUTE_SAVINGS = "savings"
+private const val ROUTE_DEBT = "debt"
 
 class MainActivity : AppCompatActivity() {
 
@@ -133,6 +139,9 @@ private fun KopilkaNavGraph(
                 onAddSpending = { navController.navigate(ROUTE_ADD_BASE) },
                 onEditEntry = { entryId -> navController.navigate("add?entryId=$entryId") },
                 onViewAll = { navController.navigate(ROUTE_LOG) },
+                onCategoryClick = { categoryId -> navController.navigate("category/$categoryId") },
+                onSavingsClick = { navController.navigate(ROUTE_SAVINGS) },
+                onDebtClick = { navController.navigate(ROUTE_DEBT) },
                 vm = categoriesVm,
             )
         }
@@ -162,6 +171,29 @@ private fun KopilkaNavGraph(
                 },
                 myName = categoriesVm.state.value.myName,
             )
+        }
+
+        composable(
+            route = ROUTE_CATEGORY_DETAIL,
+            arguments = listOf(
+                navArgument("categoryId") { type = NavType.StringType }
+            ),
+        ) { backStackEntry ->
+            val categoryId = backStackEntry.arguments?.getString("categoryId") ?: return@composable
+            CategoryDetailScreen(
+                categoryId = categoryId,
+                myName = categoriesVm.state.value.myName,
+                onBack = { navController.popBackStack() },
+                onEditEntry = { entryId -> navController.navigate("add?entryId=$entryId") },
+            )
+        }
+
+        composable(ROUTE_SAVINGS) {
+            SavingsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(ROUTE_DEBT) {
+            DebtScreen(onBack = { navController.popBackStack() })
         }
     }
 }
