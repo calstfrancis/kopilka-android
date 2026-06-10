@@ -1,0 +1,25 @@
+R_DEF: Internal format may change without notice
+local
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+drawable widget_add_pill
+drawable widget_btn_bg
+drawable widget_card_bg
+drawable widget_progress_bg
+drawable widget_progress_fill
+id widget_add_btn
+id widget_budget_text
+id widget_period_label
+id widget_progress
+id widget_spent_text
+id widget_status_text
+id widget_summary_add_btn
+layout widget_kopilka
+layout widget_summary
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+string widget_summary_desc
+style Theme.Kopilka
+xml widget_info
+xml widget_info_summary

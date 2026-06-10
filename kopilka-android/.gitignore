@@ -1,0 +1,33 @@
+# Android build output
+/build/
+app/build/
+*.apk
+*.aab
+*.ap_
+
+# Local Android SDK path — machine-specific, never commit
+local.properties
+
+# Signing keystores — contain private keys
+*.jks
+*.keystore
+*.p12
+
+# Gradle secrets (if any API keys are ever added here)
+gradle.properties.local
+
+# Android Studio / IDE
+.idea/
+*.iml
+.navigation/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Claude Code local settings
+.claude/settings.local.json

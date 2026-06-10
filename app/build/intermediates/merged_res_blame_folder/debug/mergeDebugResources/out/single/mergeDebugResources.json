@@ -1,0 +1,58 @@
+[
+    {
+        "merged": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-debug-70:/drawable_widget_btn_bg.xml.flat",
+        "source": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-main-72:/drawable/widget_btn_bg.xml"
+    },
+    {
+        "merged": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-debug-70:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-main-72:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.kopilka.android.app-debug-70:/drawable_widget_add_pill.xml.flat",
+        "source": "com.kopilka.android.app-main-72:/drawable/widget_add_pill.xml"
+    },
+    {
+        "merged": "com.kopilka.android.app-debug-70:/layout_widget_summary.xml.flat",
+        "source": "com.kopilka.android.app-main-72:/layout/widget_summary.xml"
+    },
+    {
+        "merged": "com.kopilka.android.app-debug-70:/drawable_widget_progress_fill.xml.flat",
+        "source": "com.kopilka.android.app-main-72:/drawable/widget_progress_fill.xml"
+    },
+    {
+        "merged": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-debug-70:/xml_widget_info.xml.flat",
+        "source": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-main-72:/xml/widget_info.xml"
+    },
+    {
+        "merged": "com.kopilka.android.app-debug-70:/drawable_widget_card_bg.xml.flat",
+        "source": "com.kopilka.android.app-main-72:/drawable/widget_card_bg.xml"
+    },
+    {
+        "merged": "com.kopilka.android.app-debug-70:/drawable_widget_progress_bg.xml.flat",
+        "source": "com.kopilka.android.app-main-72:/drawable/widget_progress_bg.xml"
+    },
+    {
+        "merged": "com.kopilka.android.app-debug-70:/xml_widget_info_summary.xml.flat",
+        "source": "com.kopilka.android.app-main-72:/xml/widget_info_summary.xml"
+    },
+    {
+        "merged": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-debug-70:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-main-72:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-debug-70:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-main-72:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-debug-70:/drawable_ic_launcher_background.xml.flat",
+        "source": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-main-72:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-debug-70:/layout_widget_kopilka.xml.flat",
+        "source": "/home/calstfrancis/.gradle/daemon/8.7/com.kopilka.android.app-main-72:/layout/widget_kopilka.xml"
+    },
+    {
+        "merged": "com.kopilka.android.app-debug-70:/layout_widget_kopilka.xml.flat",
+        "source": "com.kopilka.android.app-main-72:/layout/widget_kopilka.xml"
+    }
+]

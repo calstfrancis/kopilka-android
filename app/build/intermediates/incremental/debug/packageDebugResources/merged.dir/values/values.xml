@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Kopilka</string>
+    <string name="widget_summary_desc">Budget summary — spending vs budget for the current period</string>
+    <style name="Theme.Kopilka" parent="Theme.AppCompat.DayNight.NoActionBar"/>
+</resources>
