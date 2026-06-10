@@ -8,3 +8,6 @@
 # Kotlinx Serialization
 -keepattributes RuntimeVisibleAnnotations,AnnotationDefault
 -dontnote kotlinx.serialization.**
+
+# Google Tink (used by androidx.security.crypto) — compile-time annotations only, not present at runtime
+-dontwarn com.google.errorprone.annotations.**
